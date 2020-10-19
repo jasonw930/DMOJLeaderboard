@@ -8,7 +8,7 @@ require('fs').readFile('problems.txt', 'utf8', read);
 var auth = require('/users/jason/logins.json');
 var client = new Discord.Client();
 
-var prefix = '!';
+var prefix = '-';
 
 var leaderboard_msg = undefined;
 var leaderboard_org = 0;
@@ -47,6 +47,8 @@ client.on('message', (message) => {
 
     if (cmd === 'ping') {
         message.channel.send('pong');
+    } else if (cmd === 'help') {
+        message.channel.send(`\`\`\`-ping : pings the bot\n-get_pp user : gets pp of user\n-leaderboard org : gets leaderboard of organization based on pp\n-problems org : gets leaderboard of organization based on weekly problems\nMarkville organization code is 138\n\`\`\``);
     } else if (cmd === 'get_pp') {
         if (args.length < 1) {
             message.channel.send(`\`\`\`Please enter a username\`\`\``);
