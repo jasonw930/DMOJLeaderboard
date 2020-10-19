@@ -1,18 +1,14 @@
 var Discord = require('discord.js');
 var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 
-var problems;
-function read(err, data) {problems = data.split('\n');}
-require('fs').readFile('problems.txt', 'utf8', read);
+// var problems;
+// function read(err, data) {problems = data.split('\n');}
+// require('fs').readFile('problems.txt', 'utf8', read);
 
 var auth = require('/users/jason/logins.json');
 var client = new Discord.Client();
 
 var prefix = '-';
-
-var leaderboard_msg = undefined;
-var leaderboard_org = 0;
-var leaderboard_min = 0;
 
 function get_http(url, message) {
     console.log('Gettting: '.concat(url));
@@ -34,6 +30,13 @@ function get_http(url, message) {
     return response;
 }
 
+function save_dmoj(dmoj) {
+    require('fs').writeFile('dmoj.json', JSON.stringify(dmoj, null, 4), function writeJSON(err) {
+      if (err) return console.log(err);
+      console.log('Saving DMOJ');
+    });
+}
+
 client.once('ready', () => {
     console.log('DMOJ Leaderboard Online');
 });
@@ -48,7 +51,7 @@ client.on('message', (message) => {
     if (cmd === 'ping') {
         message.channel.send('pong');
     } else if (cmd === 'help') {
-        message.channel.send(`\`\`\`-ping : pings the bot\n-get_pp user : gets pp of user\n-leaderboard org : gets leaderboard of organization based on pp\n-problems list : lists weekly problems\n-problems org : gets leaderboard of organization based on weekly problems\nMarkville organization code is 138\n\`\`\``);
+        message.channel.send(`\`\`\`-ping : pings the bot\n-users : lists all users\n-get_pp [handle] : gets pp of user\n-leaderboard : gets leaderboard based on pp\n-list : lists weekly problems\n-problems : gets leaderboard of weekly problems\n-add [handle] : adds user to leaderboard\n-remove [handle] : removes user from leaderboard\`\`\``);
     } else if (cmd === 'get_pp') {
         if (args.length < 1) {
             message.channel.send(`\`\`\`Please enter a username\`\`\``);
@@ -58,91 +61,75 @@ client.on('message', (message) => {
         if ('data' in response) {
             message.channel.send(`\`\`\`${(args[0] + ':').padEnd(15)} ${response.data.object.performance_points.toFixed(2)}pp\`\`\``);
         }
-    } else if (cmd === 'leaderboard') {
-        if (args.length < 1) {
-            message.channel.send(`\`\`\`Please enter an organization id\`\`\``);
-            return;
-        }
-        var response = get_http(`https://dmoj.ca/api/v2/users?organization=${args[0]}`, message);
-        if ('data' in response) {
-            var users = response.data.objects;
-            var print_str = `\`\`\`\n`;
-
-            users.sort(function(a, b) {
-                if (a.performance_points < b.performance_points) return 1;
-                if (a.performance_points > b.performance_points) return -1;
-                return 0;
-            });
-            users.forEach(function(obj) {
-                print_str = print_str.concat(`${(obj.username + ':').padEnd(15)} ${obj.performance_points.toFixed(2)}pp\n`);
-            });
-
-            print_str = print_str.concat(`\`\`\``);
-            message.channel.send(print_str);
-        }
-    } else if (cmd === 'problems') {
-        if (args.length < 1) {
-            message.channel.send(`\`\`\`Please enter an organization id\`\`\``);
-            return;
-        }
-
-        if (args[0] === 'list') {
-            var print_str = `\`\`\`\n`;
-            problems.forEach(function(problem) {
-                var response = get_http(`https://dmoj.ca/api/v2/problem/${problem}`, message);
-                if (!'data' in response) return;
-                print_str = print_str.concat(response.data.object.name).concat('\n');
+    } else if (cmd === 'users') {
+        require('fs').readFile('dmoj.json', 'utf8', (err, data) => {
+            dmoj = JSON.parse(data);
+            print_str = `\`\`\`\n`;
+            dmoj.users.forEach(function(obj) {
+                print_str = print_str.concat(`${obj}\n`);
             });
             message.channel.send(print_str.concat(`\`\`\``));
-            return;
-        }
-        
-        var total_points = 0;
-        var user_points = [];
-        var users = [];
+        });
+    } else if (cmd === 'leaderboard') {
+        require('fs').readFile('dmoj.json', 'utf8', (err, data) => {
+            dmoj = JSON.parse(data);
+            print_str = `\`\`\`\n`;
+            dmoj.leaderboard.forEach(function(obj) {
+                print_str = print_str.concat(`${(obj.user + ':').padEnd(15)} ${obj.pp.toFixed(2)}pp\n`);
+            });
+            message.channel.send(print_str.concat(`\`\`\``));
+        });
+    } else if (cmd === 'list') {
+        require('fs').readFile('dmoj.json', 'utf8', (err, data) => {
+            dmoj = JSON.parse(data);
+            var print_str = `\`\`\`\n`;
+            dmoj.problems.forEach(function(problem) {
+                print_str = print_str.concat(problem.name).concat('\n');
+            });
+            message.channel.send(print_str.concat(`\`\`\``));
+        });
+    } else if (cmd === 'problems') {
+        require('fs').readFile('dmoj.json', 'utf8', (err, data) => {
+            dmoj = JSON.parse(data);
+            total_points = 0;
+            dmoj.problems.forEach(problem => total_points += problem.pp);
 
-        var users_response = get_http(`https://dmoj.ca/api/v2/users?organization=${args[0]}`, message);
-        if (!'data' in users_response) return;
-        users = users_response.data.objects;
-        users.forEach(function(user) {user_points.push({'name': user.username, 'points': 0})});
-        problems.forEach(function(problem) {
-            // console.log(`Looking through problem ${problem}`);
-            submissions = [];
-            page = 1;
-            while (true) {
-                var submissions_response = get_http(`https://dmoj.ca/api/v2/submissions?problem=${problem}&result=AC&page=${page}`, message);
-                if (!'data' in submissions_response) return;
-                submissions = submissions.concat(submissions_response.data.objects);
-                if (page === 1) total_points += submissions_response.data.objects[0].points;
-                if (page >= submissions_response.data.total_pages) break;
-                page++;
+            var print_str = `\`\`\`\n`;
+            dmoj.problem_board.forEach(function(obj) {
+                print_str = print_str.concat(`${(obj.user + ':').padEnd(15)} ${obj.pp.toFixed(0).padStart(3)}/${total_points}\n`);
+            });
+            message.channel.send(print_str.concat(`\`\`\``));  
+        });
+    } else if (cmd === 'add') {
+        require('fs').readFile('dmoj.json', 'utf8', (err, data) => {
+            dmoj = JSON.parse(data);
+            if (args.length < 1) {
+                message.channel.send(`\`\`\`Please enter a username\`\`\``);
+                return;
             }
-            for (var i = 0; i < users.length; i++) {
-                submissions.some(function(submission) {
-                    if (submission.user === users[i].username) {
-                        if (submission.user !== user_points[i].name) {
-                            console.log("Something broke aaahhhhh");
-                            return false;
-                        }
-                        console.log(submission.user);
-                        user_points[i].points += submission.points;
-                        return true;
-                    }
-                    return false;
-                });
+            if (!dmoj.users.includes(args[0])) {
+                dmoj.users.push(args[0]);
+                save_dmoj(dmoj);
+                message.channel.send(`\`\`\`Added ${args[0]}\`\`\``);
+            } else {
+                message.channel.send(`\`\`\`${args[0]} already added\`\`\``);
             }
         });
-        user_points.sort(function (a, b) {
-            if (a.points < b.points) return 1;
-            if (a.points > b.points) return -1;
-            return 0;
+    } else if (cmd === 'remove') {
+        require('fs').readFile('dmoj.json', 'utf8', (err, data) => {
+            dmoj = JSON.parse(data);
+            if (args.length < 1) {
+                message.channel.send(`\`\`\`Please enter a username\`\`\``);
+                return;
+            }
+            if (dmoj.users.includes(args[0])) {
+                dmoj.users.splice(dmoj.users.indexOf(args[0]), 1);
+                save_dmoj(dmoj);
+                message.channel.send(`\`\`\`Removed ${args[0]}\`\`\``);
+            } else {
+                message.channel.send(`\`\`\`${args[0]} not found\`\`\``);
+            }
         });
-        var print_str = `\`\`\`\n`;
-        user_points.forEach(function(obj) {
-            print_str = print_str.concat(`${(obj.name + ':').padEnd(15)} ${obj.points.toFixed(0).padStart(3)}/${total_points}\n`);
-        });
-        print_str = print_str.concat(`\`\`\``);
-        message.channel.send(print_str);  
     }
 });
 
