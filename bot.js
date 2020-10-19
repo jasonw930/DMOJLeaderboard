@@ -48,7 +48,7 @@ client.on('message', (message) => {
     if (cmd === 'ping') {
         message.channel.send('pong');
     } else if (cmd === 'help') {
-        message.channel.send(`\`\`\`-ping : pings the bot\n-get_pp user : gets pp of user\n-leaderboard org : gets leaderboard of organization based on pp\n-problems org : gets leaderboard of organization based on weekly problems\nMarkville organization code is 138\n\`\`\``);
+        message.channel.send(`\`\`\`-ping : pings the bot\n-get_pp user : gets pp of user\n-leaderboard org : gets leaderboard of organization based on pp\n-problems list : lists weekly problems\n-problems org : gets leaderboard of organization based on weekly problems\nMarkville organization code is 138\n\`\`\``);
     } else if (cmd === 'get_pp') {
         if (args.length < 1) {
             message.channel.send(`\`\`\`Please enter a username\`\`\``);
@@ -83,6 +83,17 @@ client.on('message', (message) => {
     } else if (cmd === 'problems') {
         if (args.length < 1) {
             message.channel.send(`\`\`\`Please enter an organization id\`\`\``);
+            return;
+        }
+
+        if (args[0] === 'list') {
+            var print_str = `\`\`\`\n`;
+            problems.forEach(function(problem) {
+                var response = get_http(`https://dmoj.ca/api/v2/problem/${problem}`, message);
+                if (!'data' in response) return;
+                print_str = print_str.concat(response.data.object.name).concat('\n');
+            });
+            message.channel.send(print_str.concat(`\`\`\``));
             return;
         }
         
