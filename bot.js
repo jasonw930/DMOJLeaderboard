@@ -1,5 +1,6 @@
-var Discord = require('discord.js');
-var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
+const Discord = require('discord.js');
+const XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
+const fs = require('fs');
 
 // var problems;
 // function read(err, data) {problems = data.split('\n');}
@@ -11,7 +12,7 @@ var client = new Discord.Client();
 var prefix = '-';
 
 function get_http(url, message) {
-    console.log('Gettting: '.concat(url));
+    console.log('Getting: '.concat(url));
     var response = [];
     var xhttp = new XMLHttpRequest();
     xhttp.open('GET', url, false);
@@ -32,7 +33,7 @@ function get_http(url, message) {
 }
 
 function save_dmoj(dmoj) {
-    require('fs').writeFile('dmoj.json', JSON.stringify(dmoj, null, 4), function writeJSON(err) {
+    fs.writeFile('dmoj.json', JSON.stringify(dmoj, null, 4), function writeJSON(err) {
       if (err) return console.log(err);
       console.log('Saving DMOJ');
     });
@@ -63,7 +64,7 @@ client.on('message', (message) => {
             message.channel.send(`\`\`\`${(args[0] + ':').padEnd(15)} ${response.data.object.performance_points.toFixed(2)}pp\`\`\``);
         }
     } else if (cmd === 'users') {
-        require('fs').readFile('dmoj.json', 'utf8', (err, data) => {
+        fs.readFile('dmoj.json', 'utf8', (err, data) => {
             dmoj = JSON.parse(data);
             print_str = `\`\`\`\n`;
             dmoj.users.forEach(function(obj) {
@@ -71,8 +72,8 @@ client.on('message', (message) => {
             });
             message.channel.send(print_str.concat(`\`\`\``));
         });
-    } else if (cmd === 'leaderboard') {
-        require('fs').readFile('dmoj.json', 'utf8', (err, data) => {
+    } else if (cmd === 'leaderboard' || cmd === 'lb') {
+        fs.readFile('dmoj.json', 'utf8', (err, data) => {
             dmoj = JSON.parse(data);
             print_str = `\`\`\`\n`;
             dmoj.leaderboard.forEach(function(obj) {
@@ -81,7 +82,7 @@ client.on('message', (message) => {
             message.channel.send(print_str.concat(`\`\`\``));
         });
     } else if (cmd === 'list') {
-        require('fs').readFile('dmoj.json', 'utf8', (err, data) => {
+        fs.readFile('dmoj.json', 'utf8', (err, data) => {
             dmoj = JSON.parse(data);
             var print_str = `\`\`\`\n`;
             dmoj.problems.forEach(function(problem) {
@@ -90,7 +91,7 @@ client.on('message', (message) => {
             message.channel.send(print_str.concat(`\`\`\``));
         });
     } else if (cmd === 'problems') {
-        require('fs').readFile('dmoj.json', 'utf8', (err, data) => {
+        fs.readFile('dmoj.json', 'utf8', (err, data) => {
             dmoj = JSON.parse(data);
             total_points = 0;
             dmoj.problems.forEach(problem => total_points += problem.pp);
@@ -102,7 +103,7 @@ client.on('message', (message) => {
             message.channel.send(print_str.concat(`\`\`\``));  
         });
     } else if (cmd === 'add') {
-        require('fs').readFile('dmoj.json', 'utf8', (err, data) => {
+        fs.readFile('dmoj.json', 'utf8', (err, data) => {
             dmoj = JSON.parse(data);
             if (args.length < 1) {
                 message.channel.send(`\`\`\`Please enter a username\`\`\``);
@@ -117,7 +118,7 @@ client.on('message', (message) => {
             }
         });
     } else if (cmd === 'remove') {
-        require('fs').readFile('dmoj.json', 'utf8', (err, data) => {
+        fs.readFile('dmoj.json', 'utf8', (err, data) => {
             dmoj = JSON.parse(data);
             if (args.length < 1) {
                 message.channel.send(`\`\`\`Please enter a username\`\`\``);
