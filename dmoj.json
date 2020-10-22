@@ -1,0 +1,134 @@
+{
+    "users": [
+        "Redstone_Flash",
+        "SirTechnical",
+        "baka",
+        "potatoritos",
+        "SparklMastr",
+        "BiriBiri",
+        "b0806",
+        "Awedtan",
+        "LavanSumanan",
+        "potato_nuggetz",
+        "Dessertion"
+    ],
+    "problems": [
+        {
+            "id": "ccc18j5",
+            "name": "CCC '18 J5 - Choose your own path",
+            "pp": 7
+        },
+        {
+            "id": "vmss7wc16c3p2",
+            "name": "VM7WC '16 #3 Silver - Can Shahir even get there?!",
+            "pp": 5
+        },
+        {
+            "id": "ccc01s3",
+            "name": "CCC '01 S3 - Strategic Bombing",
+            "pp": 10
+        },
+        {
+            "id": "ccc10j5",
+            "name": "CCC '10 J5 - Knight Hop",
+            "pp": 7
+        },
+        {
+            "id": "dmopc17c2p3",
+            "name": "DMOPC '17 Contest 2 P3 - Bad Bunnies",
+            "pp": 7
+        }
+    ],
+    "leaderboard": [
+        {
+            "user": "Redstone_Flash",
+            "pp": 459.203764343836
+        },
+        {
+            "user": "potatoritos",
+            "pp": 342.023620044298
+        },
+        {
+            "user": "SirTechnical",
+            "pp": 237.599017285449
+        },
+        {
+            "user": "BiriBiri",
+            "pp": 231.540315445289
+        },
+        {
+            "user": "potato_nuggetz",
+            "pp": 209.730231108649
+        },
+        {
+            "user": "b0806",
+            "pp": 205.439046285757
+        },
+        {
+            "user": "Awedtan",
+            "pp": 130.18642085370746
+        },
+        {
+            "user": "LavanSumanan",
+            "pp": 71.8160444380945
+        },
+        {
+            "user": "SparklMastr",
+            "pp": 63.4679909160314
+        },
+        {
+            "user": "baka",
+            "pp": 54.2202889401605
+        },
+        {
+            "user": "Dessertion",
+            "pp": 35.70865
+        }
+    ],
+    "problem_board": [
+        {
+            "user": "Redstone_Flash",
+            "pp": 36
+        },
+        {
+            "user": "baka",
+            "pp": 36
+        },
+        {
+            "user": "SirTechnical",
+            "pp": 29
+        },
+        {
+            "user": "potatoritos",
+            "pp": 17
+        },
+        {
+            "user": "b0806",
+            "pp": 12
+        },
+        {
+            "user": "potato_nuggetz",
+            "pp": 12
+        },
+        {
+            "user": "BiriBiri",
+            "pp": 7
+        },
+        {
+            "user": "SparklMastr",
+            "pp": 0
+        },
+        {
+            "user": "Awedtan",
+            "pp": 0
+        },
+        {
+            "user": "LavanSumanan",
+            "pp": 0
+        },
+        {
+            "user": "Dessertion",
+            "pp": 0
+        }
+    ]
+}

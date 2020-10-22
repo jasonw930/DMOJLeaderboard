@@ -19,8 +19,9 @@ function get_http(url, message) {
     xhttp.onload = function() {
         if (xhttp.status !== 200) {
             message.channel.send(`\`\`\`HTTP Error ${xhttp.status}\`\`\``);
+        } else {
+            response = JSON.parse(xhttp.responseText);
         }
-        response = JSON.parse(xhttp.responseText);
     };
     xhttp.onerror = function() {
         message.channel.send(`\`\`\`Something went wrong :(\`\`\``);
@@ -51,7 +52,7 @@ client.on('message', (message) => {
     if (cmd === 'ping') {
         message.channel.send('pong');
     } else if (cmd === 'help') {
-        message.channel.send(`\`\`\`-ping : pings the bot\n-users : lists all users\n-get_pp [handle] : gets pp of user\n-leaderboard : gets leaderboard based on pp\n-list : lists weekly problems\n-problems : gets leaderboard of weekly problems\n-add [handle] : adds user to leaderboard\n-remove [handle] : removes user from leaderboard\`\`\``);
+        message.channel.send(`\`\`\`Score update every 2 minutes\n-ping : pings the bot\n-users : lists all users\n-get_pp [handle] : gets pp of user\n-leaderboard : gets leaderboard based on pp\n-list : lists weekly problems\n-problems : gets leaderboard of weekly problems\n-add [handle] : adds user to leaderboard\n-remove [handle] : removes user from leaderboard\`\`\``);
     } else if (cmd === 'get_pp') {
         if (args.length < 1) {
             message.channel.send(`\`\`\`Please enter a username\`\`\``);
